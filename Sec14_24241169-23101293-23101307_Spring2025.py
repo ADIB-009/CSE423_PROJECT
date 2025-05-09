@@ -55,7 +55,7 @@ def create_enemy_bullet():
 def shoot():
     global t2, enemy_spaceship,enemy_bullet,player_pos
     t = int(time.time())
-    if (t - t2) > 3:
+    if (t - t2) > 5:
         t2 = t
         for i in enemy_spaceship:
             x,y = i
@@ -66,7 +66,7 @@ def shoot():
 for i in range(100):
     asteroid.append(create_asteroid())
 
-for i in range(20):
+for i in range(10):
     enemy_spaceship.append(create_enemy_spaceship())
 
 
@@ -137,21 +137,22 @@ def keyboardListener(key, x, y):
 
     if key == b'w' and game_state:
         t = int(time.time())
-        if (t - t1) > 10:
+        print(t, t1, t - t1)
+        if (t - t1) > 5:
             t1 = t
-            ship_speed = 2
+            ship_speed = 3
 
     if key == b's' and game_state:
         pass
 
     if key == b'a' and game_state:
         x1, y1, z1, angle = player_pos
-        angle += 1
+        angle += 3
         player_pos = x1, y1, z1, angle
 
     if key == b'd' and game_state:
         x1, y1, z1, angle = player_pos
-        angle -= 1
+        angle -= 3
         player_pos = x1, y1, z1, angle
 
     if key == b'r':
@@ -277,8 +278,8 @@ def idle():
             if d < 0:
                 d += 360
 
-            x2 += 1 * math.cos(math.radians(d))
-            y2 += 1 * math.sin(math.radians(d))
+            x2 += 0.9 * math.cos(math.radians(d))
+            y2 += 0.9 * math.sin(math.radians(d))
             enemy_spaceship[j] = (x2, y2)
 
         for k in range(len(enemy_bullet)):
@@ -379,7 +380,7 @@ def game_info():
         draw_text(10, 770, f"Spaceship Health: ", (1, 1, 1), True)
         draw_text(10, 740, f"Game Score: {score}", (1, 1, 1))
         t = int(time.time())
-        if ((t - t1) > 10 and t % 2 == 0):
+        if ((t - t1) > 5 and t % 2 == 0):
             draw_text(
                 300, 680, "Speed Boost is available now! Press W to activate", (1, 1, 0.3))
 
@@ -504,8 +505,9 @@ def draw_enemy_spaceship(x, y, z):
 
 
 def run_game():
-    global game_over, game_state, player_pos, map_edge, ship_speed, player_life
+    global game_over, game_state, player_pos, map_edge, ship_speed, player_life, t1
     x, y, z, angle = player_pos
+    
     if player_life <= 0:
         game_state = False
 
