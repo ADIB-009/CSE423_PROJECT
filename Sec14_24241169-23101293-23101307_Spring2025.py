@@ -6,6 +6,7 @@ import math
 import time
 import random
 
+
 player_pos = (0, 0, 0, 0)
 x, y, z, angle = player_pos
 camera_pos = (x, y+70, z+100)
@@ -23,13 +24,15 @@ enemy_bullet = []
 ang = 0
 map_edge = False
 ship_color = (0.95, 0.95, 0.86)
-ship_speed = 1
+ship_speed = 3
 d, h = -500, 500
+
 
 def create_asteroid():
     x = random.randint(-10000, 10000)
     y = random.randint(-10000, 10000)
     z = random.randint(-10000, 10000)
+    
     return (x, y, z)
 
 
@@ -63,7 +66,7 @@ def shoot():
 
 
 
-for i in range(100):
+for i in range(500):
     asteroid.append(create_asteroid())
 
 for i in range(10):
@@ -137,22 +140,21 @@ def keyboardListener(key, x, y):
 
     if key == b'w' and game_state:
         t = int(time.time())
-        print(t, t1, t - t1)
         if (t - t1) > 5:
             t1 = t
-            ship_speed = 3
+            ship_speed = 10
 
     if key == b's' and game_state:
         pass
 
     if key == b'a' and game_state:
         x1, y1, z1, angle = player_pos
-        angle += 3
+        angle += 2
         player_pos = x1, y1, z1, angle
 
     if key == b'd' and game_state:
         x1, y1, z1, angle = player_pos
-        angle -= 3
+        angle -= 2
         player_pos = x1, y1, z1, angle
 
     if key == b'r':
@@ -161,6 +163,7 @@ def keyboardListener(key, x, y):
         camera_pos = (x, y+70, z+100)
         t1 = int(time.time())
         t2 = int(time.time())
+        fovY = 125
         player_life = 100
         score = 0
         fpp = False
@@ -172,12 +175,12 @@ def keyboardListener(key, x, y):
         ang = 0
         map_edge = False
         ship_color = (0.95, 0.95, 0.86)
-        ship_speed = 1
+        ship_speed = 3
         d, h = -500, 500
-        for i in range(100):
+        for i in range(500):
             asteroid.append(create_asteroid())
 
-        for i in range(20):
+        for i in range(10):
             enemy_spaceship.append(create_enemy_spaceship())
 
 
@@ -232,7 +235,6 @@ def setupCamera():
 
     # Extract camera position and look-at target
     x1, y1, z1, angle = player_pos
-    x2, y2, z2 = camera_pos
 
     rad = math.radians(angle)
 
@@ -243,9 +245,9 @@ def setupCamera():
     cy = y1 + dy
     cz = z1 + h
 
-    gluLookAt(cx, cy, cz,  # Camera position
-              x1, y1, z1,  # Camera position
-              0, 0, 1)  # Set the camera to look at the target
+    gluLookAt(cx, cy, cz,
+              x1, y1, z1,
+              0, 0, 1)
 
 
 def idle():
@@ -264,8 +266,8 @@ def idle():
 
         for i in range(len(bullet)):
             x, y, z, dir = bullet[i]
-            y -= 7 * math.cos(math.radians(dir))
-            x += 7 * math.sin(math.radians(dir))
+            y -= 15 * math.cos(math.radians(dir))
+            x += 15 * math.sin(math.radians(dir))
             bullet[i] = x, y, z, dir
 
         x1, y1, z1, angle = player_pos
@@ -278,8 +280,8 @@ def idle():
             if d < 0:
                 d += 360
 
-            x2 += 0.9 * math.cos(math.radians(d))
-            y2 += 0.9 * math.sin(math.radians(d))
+            x2 += 2 * math.cos(math.radians(d))
+            y2 += 2 * math.sin(math.radians(d))
             enemy_spaceship[j] = (x2, y2)
 
         for k in range(len(enemy_bullet)):
@@ -289,8 +291,8 @@ def idle():
             dr = math.degrees(math.atan2(b,a))
             if dr < 0:
                 dr += 360
-            x -= 2 * math.cos(math.radians(dr))
-            y -= 2 * math.sin(math.radians(dr))
+            x -= 15 * math.cos(math.radians(dr))
+            y -= 15 * math.sin(math.radians(dr))
             enemy_bullet[k] = x, y, z, d
 
     glutPostRedisplay()
@@ -300,13 +302,6 @@ def check_range():
     x, y, z, angle = player_pos
     if (x > 10000) or (x < -10000) or (y > 10000) or (y < -10000) or (z > 10000) or (z < -10000):
         game_state = False
-    # temp = []
-    # for i in range(len(bullet)):
-    #     x, y, z, dir = bullet[i]
-    #     if (x >= -600) and (x <= 600) and (y >= 0) and (y <= 600):
-    #         temp.append((x, y, z, dir))
-    # bullet = temp
-
 
 
 def check_hit():
@@ -342,10 +337,11 @@ def check_hit():
             b -= 0.1
             ship_color = (r, g, b)
             enemy_spaceship[k] = create_enemy_spaceship()
+
     for a in range(len(asteroid)):
-        x_a, y_a, z_a = asteroid[a]
-        d = ((x_a - x3) ** 2 + (y_a - y3) ** 2 + (z_a - z3) ** 2) ** (0.5)
-        if d < 150:
+        x1, y1, z1 = asteroid[a]
+        d_a = ((x1 - x3)**2 + (y1 - y3)**2 + (z1 - z3)**2)**0.5
+        if d_a < 100:
             player_life -= 5
             r, g, b = ship_color
             r += 0.1
@@ -359,7 +355,7 @@ def check_hit():
         dr = ((x - x3) ** 2 +(y - y3)**2 + (z - z3) * 2) **(0.5)
         if dr < 50:
             enemy_bullet[i] = (-1000000, -1000000, -100000, d)
-            player_life -= 0.5
+            player_life -= 1
             r, g, b = ship_color
             r += 0.01
             g -= 0.01
@@ -389,13 +385,14 @@ def game_info():
                 draw_text(
                     10, 710, "Approaching the firewall !!\nTurn back immediately!!", (1, 0.3, 0))
     else:
-        draw_text(10, 770, f"Game is over. Your Score is {score}", (1, 1, 1))
-        draw_text(10, 740, f'Press "R" to RESTART the Game.', (1, 1, 1))
+        draw_text(360, 500, f"Game is over. Your Score is {score}", (1, 1, 1))
+        draw_text(360, 460, f'Press "R" to RESTART the Game.', (1, 1, 1))
 
 
 def draw_game_space():
     global player_pos, map_edge
     x, y, z, angle = player_pos
+    t = int(time.time())
 
     glBegin(GL_QUADS)
 
@@ -485,7 +482,8 @@ def draw_enemy_spaceship(x, y, z):
     global player_pos
     x1, y1, z1, ang = player_pos
     glPushMatrix()
-    glColor3f(0.529, 0.81, 0.921)
+    # glColor3f(0.529, 0.81, 0.921)
+    glColor3f(0.5, 0., 0.5)
     glTranslatef(x, y, z)
     glRotate(ang, 0, 0, 1)
     glutSolidCube(90)
@@ -512,12 +510,12 @@ def run_game():
         game_state = False
 
     if game_state:
+        draw_game_space()
+        check_hit()
         draw_asteroid()
         spawn_enemy_spaceship()
         draw_spaceship()
         draw_bullet()
-        draw_game_space()
-        check_hit()
         check_range()
         create_enemy_bullet()
         shoot()
@@ -529,7 +527,7 @@ def run_game():
 
         t = int(time.time())
         if (t - t1) > 3:
-            ship_speed = 1
+            ship_speed = 3
     game_info()
 
 
