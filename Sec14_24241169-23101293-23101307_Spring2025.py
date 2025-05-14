@@ -16,7 +16,8 @@ fovY = 125
 player_life = 100
 score = 0
 fpp = False
-game_state = True
+game_state = False
+game_start = True
 enemy_spaceship = []
 asteroid = []
 bullet = []
@@ -136,7 +137,7 @@ def draw_bullet():
 
 
 def keyboardListener(key, x, y):
-    global player_pos, player_life, score, fpp, game_state, enemy_spaceship, asteroid, map_edge, camera_pos, bullet, ang, ship_color, ship_speed, t1, t2, d, h, enemy_bullet
+    global player_pos, player_life, score, fpp, game_state, enemy_spaceship, asteroid, map_edge, camera_pos, bullet, ang, ship_color, ship_speed, t1, t2, d, h, enemy_bullet, game_start
 
     if key == b'w' and game_state:
         t = int(time.time())
@@ -156,6 +157,9 @@ def keyboardListener(key, x, y):
         x1, y1, z1, angle = player_pos
         angle -= 2
         player_pos = x1, y1, z1, angle
+    
+    if key == b'x':
+        glutLeaveMainLoop()
 
     if key == b'r':
         player_pos = (0, 0, 0, 0)
@@ -168,6 +172,7 @@ def keyboardListener(key, x, y):
         score = 0
         fpp = False
         game_state = True
+        game_start = False
         enemy_spaceship = []
         asteroid = []
         bullet = []
@@ -370,23 +375,30 @@ def check_hit():
 
 
 def game_info():
-    global game_state, player_life, score, map_edge, t1
+    global game_state, player_life, score, map_edge, t1, game_start
 
-    if game_state:
-        draw_text(10, 770, f"Spaceship Health: ", (1, 1, 1), True)
-        draw_text(10, 740, f"Game Score: {score}", (1, 1, 1))
-        t = int(time.time())
-        if ((t - t1) > 5 and t % 2 == 0):
-            draw_text(
-                300, 680, "Speed Boost is available now! Press W to activate", (1, 1, 0.3))
-
-        if map_edge:
-            if (t % 2 == 0):
-                draw_text(
-                    10, 710, "Approaching the firewall !!\nTurn back immediately!!", (1, 0.3, 0))
+    if game_start:
+        draw_text(380, 500, f"Welcome to Star Wars 3D", (1, 1, 1))
+        draw_text(360, 460, f'Please Press R to start the game', (1, 1, 1))
+        draw_text(380, 420, f'Press X to close the game', (1, 1, 1))
+    
     else:
-        draw_text(360, 500, f"Game is over. Your Score is {score}", (1, 1, 1))
-        draw_text(360, 460, f'Press "R" to RESTART the Game.', (1, 1, 1))
+        if game_state:
+            draw_text(10, 770, f"Spaceship Health: ", (1, 1, 1), True)
+            draw_text(10, 740, f"Game Score: {score}", (1, 1, 1))
+            t = int(time.time())
+            if ((t - t1) > 5 and t % 2 == 0):
+                draw_text(
+                    300, 680, "Speed Boost is available now! Press W to activate", (1, 1, 0.3))
+
+            if map_edge:
+                if (t % 2 == 0):
+                    draw_text(
+                        10, 710, "Approaching the firewall !!\nTurn back immediately!!", (1, 0.3, 0))
+        else:
+            draw_text(360, 500, f"Game is over. Your Score is {score}", (1, 1, 1))
+            draw_text(360, 460, f'Press "R" to RESTART the Game.', (1, 1, 1))
+            draw_text(380, 420, f'Press X to close the game', (1, 1, 1))
 
 
 def draw_game_space():
